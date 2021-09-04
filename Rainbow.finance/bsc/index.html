@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FVPF142HT2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-FVPF142HT2');
+    </script>
+    <title>RNBO &#8211; Rainbow Farm Finance</title>
+    <link rel="icon" href="assets/images/main logo.png" />
+    <link rel="apple-touch-icon" href=" " />
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body class="dark-theme">
+    <div id="preloader" style="">
+        <div class="lds-ellipsis">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <div id="app" style="opacity: 0">
+        <div class="wrapper">
+            <!-- /sidebar -->
+            <nav id="sidebar" class="">
+                <div class="sidebar-header">
+                    <div class="main-logo"></div>
+                </div>
+                <ul class="list-unstyled" style="padding-left: 3px;">
+                    <li v-for="(section,index) in sections" :key="index" @click="sortBy = 'default'; if(index != 1) selectedSection = index; fetchData(); if (jQuery('#sidebar').hasClass('active')) jQuery('#sidebarCollapse').click();">
+                        <a :href="section.href" :class="[section.class,{ 'active' : selectedSection == index }]" @click="if(index == 1) goToSwap();">
+                            <span>{{section.title}}</span>
+                        </a>
+                    </li>
+                    <li><a href="https://docs.rainbowfarm.finance/" target="_blank" class="lnk docs"><span>Docs</span></a></li>
+                    <li><a href="https://docs.rainbowfarm.finance/contract" target="_blank" class="lnk contacts"><span>Contracts</span></a></li>
+                </ul>
+                <div class="sidebar-footer">
+                    <div class="calculator-container">
+                        <div class="input-group">
+                            <a class="text" style="color: #000000;" href="  ">RNBO</a><span class="bigger-letter"> </span></a>
+                            <a class="input" id="calcWAULTXPrice" href=" ">$<span>{{RNBOPrice}}</span></a>
+                        </div>
+                    </div>
+
+                    <div class="action d-flex justify-content-between">
+                        <div class="switch-themes">
+                            <a href="#" onclick="return false;" :class="['light',{ 'active' : getCookies().get('theme_color') == 'light' }]" data-type="light"></a>
+                            <a href="#" onclick="return false;" :class="['dark',{ 'active' : getCookies().get('theme_color') == 'dark' }]" data-type="dark"></a>
+                        </div>
+                        <div class="langs text-right" v-if="false">
+                            <a href="#" onclick="return false;" class="active">EN</a>
+                            <a href="#" onclick="return false;" class="">ES</a>
+                        </div>
+                    </div>
+
+                    <div class="social">
+                        <a href="https://discord.gg/" target="_blank" class="slink discord"></a>
+                        <a href="https://github.com/" target="_blank" class="slink github"></a>
+                        <a href="https://t.me/" target="_blank" class="slink telegram"></a>
+                        <a href="https://twitter.com/" target="_blank" class="slink twitter"></a>
+                        <a href="https://twitter.com/" target="_blank" class="slink twitter"></a>
+                    </div>
+                </div>
+            </nav>
+            <!-- /menu-button -->
+            <a type="button" id="sidebarCollapse" class="btn-mobile-menu">
+                <span class="mdi mdi-menu"></span>
+            </a>
+            <!-- /content -->
+            <div id="page-wrapper-overlay" @click="if (jQuery('#sidebar').hasClass('active')) jQuery('#sidebarCollapse').click();">
+            </div>
+            <div id="page-wrapper">
+                <!-- /connect-wallet -->
+                <div class="inner-navigation">
+                    <div class="container-fluid">
+                        <div class="row mb-4" style=" justify-content: flex-end; ">
+                            <div class="col-xl-7 order-1 order-xl-0 filters">
+                                <div class="row" style="margin-top: 35px; justify-content: flex-end;">
+
+                                    <div class="filter mb-2 mb-md-0" style="padding-right: 15px">
+                                        <button type="button" style="margin-top: 0; margin-right: auto;" class="btn btn-default float-right" id="connectWallet" @click="walletButtonClick">{{ walletButton.text }}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /Home -->
+                <div class="container-fluid page-container" v-if="selectedSection == 0">
+                    <img src="assets/images/B.png" alt="banner" class="banner">
+                    <div class="row mt-5">
+
+                        <div class="col-lg-6">
+                            <div class="block-rounded dark-green block-total d-flex justify-content-between" id="protocolTotal">
+                                <div class="label">Total Value Locked</div>
+                                <div class="total text-right">$<span>{{formatNumber((totalTotalValueLocked).toLocaleString('en-US'), 0)}}</span></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="block-rounded dark-green block-total d-flex justify-content-between" id="protocolTotal">
+                                <div class="label">RNBO Total Value Locked</div>
+                                <div class="total text-right">$<span>{{formatNumber((waultTotalValueLocked).toLocaleString('en-US'), 0)}}</span></div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 order-1 order-sm-0">
+                            <div class="row">
+                                <div class="col-lg-4" v-if="false">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="RNBOCirculatonTotal">
+                                                <div class="label">Your Balance</div>
+                                                <div class="total text-right"><span>{{selectedAccount != null ? formatNumber(RnboBalance.toLocaleString('en-US')) : 'N/A'}}</span> RNBO</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="waltCirculatonTotal">
+                                                <div class="label">Circulation</div>
+                                                <div class="total text-right"><span>{{formatNumber(RnboCirculation.toLocaleString('en-US'),0)}}</span> RNBO</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="waltBurnedTotal">
+                                                <div class="label">Burned Supply</div>
+                                                <div class="total text-right"><span>{{formatNumber(lmTotalRewards.toLocaleString('en-US'),0)}}</span>RNBO </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="logo-ow logo-walt-inner"></div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="RNBOCirculatonTotal">
+                                                <div class="label">Your Balance</div>
+                                                <div class="total text-right"><span>{{selectedAccount != null ? formatNumber(waultxBalance.toLocaleString('en-US')) : 'N/A'}}</span> RNBO<span class="bigger-letter"> </span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="RNBOCirculatonTotal">
+                                                <div class="label">Circulation</div>
+                                                <div class="total text-right"><span>{{formatNumber(waultxCirculation.toLocaleString('en-US'),0)}}</span> RNBO<span class="bigger-letter"></span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="RNBOBurnedTotal">
+                                                <div class="label">Burned Supply</div>
+                                                <div class="total text-right"><span>{{formatNumber(waultxBurned.toLocaleString('en-US'),0)}}</span> RNBO<span class="bigger-letter"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="logo "></div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="RNBOCirculatonTotal">
+                                                <div class="label">Your Balance</div>
+                                                <div class="total text-right"><span>{{selectedAccount != null ? formatNumber(RNBOBalance.toLocaleString('en-US')) : 'N/A'}}</span> RNBO</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="RNBOCirculatonTotal">
+                                                <div class="label">Circulation</div>
+                                                <div class="total text-right"><span>{{formatNumber(RNBOCirculation.toLocaleString('en-US'),0)}}</span> RNBO</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="block-rounded block-total d-flex justify-content-between" id="RNBOBurnedTotal">
+                                                <div class="label">Burned Supply</div>
+                                                <div class="total text-right"><span>{{formatNumber(RNBOBurned.toLocaleString('en-US'),0)}}</span> RNBO</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 order-0 order-sm-1" v-if="false">
+                            <div class="convertRow">
+                                <div class="convert-img">
+                                    <div class="logo-ow logo-walt-old-inner"></div>
+                                    <div class="logo-arrow-inner"></div>
+                                    <div class="logo-ow logo-walt-inner"></div>
+                                </div>
+                                <div class="convert-form">
+                                    <div class="inputs">
+                                        <div class="input-group">
+                                            <span class="text pointer" @click="waultxSwapAmount = waultBalance">MAX</span>
+                                            <input type="number" min="0" step="0.1" class="input" v-model="waultxSwapAmount">
+                                            <span class="textr static-text">RNBO</span>
+                                        </div>
+
+                                        <button type="button" class="btn btn-default form-button" @click="waultxSwapApproved ? waultxSwapExecute() : waultxSwapApprove()">{{waultxSwapApproved ? 'Convert' : 'Approve' }}</button>
+
+                                        <div class="input-group static-input">
+                                            <input type="number" min="0" step="0.1" class="input static-input" :value="Number(waultxSwapAmount)*1000" disabled>
+                                            <span class="textr static-text">RNBO<span class="bigger-letter"> </span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- /farms -->
+                <div class="container-fluid page-container" v-if="selectedSection == 2">
+                    <div class="row mb-4">
+                        <div class="col-xl-7 order-1 order-xl-0 filters">
+                            <div class="row">
+                                <div class="filter col-md-4 mb-2 mb-md-0">
+                                    <div class="title">Sort by</div>
+                                    <div class="vault-select-wrapper">
+                                        <div class="vault-select">
+                                            <input type="hidden" id="sortBy" value="default">
+                                            <div class="vault-select__trigger"><span>Default</span>
+                                                <div class="arrow"></div>
+                                            </div>
+                                            <div class="custom-options">
+                                                <span class="custom-option selected" data-value="default">Default</span>
+                                                <span class="custom-option" data-value="apr">APR</span>
+                                                <span class="custom-option" data-value="liquidity">Liquidity</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="filter col-md-4">
+                                    <div class="title">Search</div>
+
+                                    <div class="input-search">
+                                        <input type="text" name="search" v-model="farmsSearch">
+                                    </div>
+
+                                </div>
+                                <div class="filter col-md-4">
+                                    <label class="custom-checkbox">Staked only
+                                        <input type="checkbox" v-model="farmsStakedOnly" :disabled="selectedAccount == null">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-5 order-0 order-xl-1 mb-3 mb-xl-0 text-right">
+                            <div class="info-tvl d-flex justify-content-between" id="tvlValts">
+                                <div class="label">TVL:</div>
+                                <div class="total">$<span style="font-family: 'NeutraDisp-Bold'">{{formatNumber(selectedFarms.reduce(function (accumulator, farm) {return accumulator + farm.totalValueLocked;}, 0).toLocaleString('en-US'),0)}}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" v-for="(farm, index) in selectedFarms" :key="farm.i">
+                            <div class="vault-container collapsed" data-id="1" v-if="farm.orderId >= 0">
+                                <div class="vault-header w-100">
+                                    <img v-if="farm.isNew" src="assets/images/new-badge.svg" alt="New" style="position: absolute; max-width: 3rem; left: 5px; top: 5px;z-index: 1;">
+                                    <img v-if="farm.isBoosted" src="assets/images/boosted-badge.svg" alt="Boosted" style="position: absolute; max-width: 4.5rem; left: 5px; top: 5px;z-index: 1;">
+                                    <img v-if="farm.isFinished" src="assets/images/ended-badge.svg" alt="Finished" style="position: absolute; max-width: 3.5rem; left: 5px; top: 5px;z-index: 1;">
+                                    <div class="logo-container">
+                                        <div class="vault-logo">
+                                            <div class="img" :style="farm.style"></div>
+                                        </div>
+                                        <div class="vault-info">
+                                            <a href="#" class="title no-info" onclick="return false;" v-html="farm.title"></a>
+                                            <div class="get" style="font-family: NeutraText-Book; margin-bottom:5px">
+                                                <a href=" " target="_blank" style="color:unset" v-if="farm.subtitle !== undefined">{{farm.subtitle}} <img src="assets/images/ELE-logo.svg" style="height: 20px;"></a>
+                                            </div>
+                                            <div class="get">
+                                                <a :href="farm.getHref" target="_blank" style="color:unset">Get {{farm.currency}} {{[0,1].includes(farm.i) ? '' : [3,6,7].includes(farm.i) ? 'Cake-LP' : 'WLP'}}</a>
+                                            </div>
+                                        </div>
+                                        <div class="vault-digging">
+                                        </div>
+                                    </div>
+                                    <div class="information-container c4">
+                                        <div class="vault-staked">
+                                            <div class="total"><span :class="[{ 'small-na' : selectedAccount == null}]">{{selectedAccount != null ? '$' + formatNumber((farm.amount * farm.lpPrice).toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="small-info">Staked</div>
+                                        </div>
+                                        <div class="vault-earned">
+                                            <div class="total"><span :class="[{ 'small-na' : selectedAccount == null}]">{{selectedAccount != null ? '$' + formatNumber((farm.pendingRewards * RNBOPrice).toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="small-info">Earned</div>
+                                        </div>
+                                        <div class="vault-apy">
+                                            <a href="#" @click="jQuery('#farmDialogRoi'+index).modal('show');" class="total" onclick="return false;"><span>{{formatNumber((farm.apy + farm.feeApr).toLocaleString('en-US'))}}</span>%</a>
+                                            <div class="small-info">APR</div>
+                                        </div>
+                                        <div class="vault-liquidity">
+                                            <div class="total">$<span>{{formatNumber(farm.totalValueLocked.toLocaleString('en-US'), 0)}}</span></div>
+                                            <div class="small-info">Liquidity</div>
+                                        </div>
+                                    </div>
+                                    <div class="vault-chevron">
+                                        <span class="mdi mdi-chevron-down"></span>
+                                    </div>
+                                </div>
+                                <div class="vault-content w-100">
+                                    <div class="bl balance">
+                                        <div class="vault-form">
+                                            <div class="title">Your {{farm.i == 0 ? 'RNBO ' : farm.i == 1 ? 'RNBO ' : 'LP '}}Balance</div>
+                                            <div class="total"><span>{{selectedAccount != null ? farm.i == 14 ? formatNumber(farm.balance.toLocaleString('en-US'), 6) :  formatNumber(farm.balance.toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="inputs">
+                                                <div class="input-group">
+                                                    <input class="input" type="number" min="0" step="0.1" v-model="farm.depositAmount" />
+                                                    <span class="text" @click="farmSetDepositAmount(farm.i, $event)" style="cursor: pointer">MAX</span>
+                                                </div>
+                                                <button type="button" class="btn btn-default form-button" @click="farm.isApproved ? farmDeposit(farm) : farmApprove(farm)">{{farm.isApproved ? 'Stake' : 'Approve' }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bl staked">
+                                        <div class="vault-form">
+                                            <div class="title">{{farm.i == 0 ? 'RNBO ' : farm.i == 1 ? 'RNBO ' : 'LP '}}Staked</div>
+                                            <div class="total"><span>{{selectedAccount != null ? farm.i == 14 ? formatNumber(farm.amount.toLocaleString('en-US'), 6) : formatNumber(farm.amount.toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="inputs">
+                                                <div class="input-group">
+                                                    <input class="input" type="number" min="0" step="0.1" v-model="farm.withdrawAmount" />
+                                                    <span class="text" @click="farmSetWithdrawAmount(farm.i, $event)" style="cursor: pointer">MAX</span>
+                                                </div>
+                                                <button type="button" class="btn btn-default form-button" @click="farmWithdraw(farm)">Unstake</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bl rewards">
+                                        <div class="vault-form">
+                                            <div class="title">{{farm.earned}} Earned</div>
+                                            <div class="total"><span>{{selectedAccount != null ? formatNumber(farm.pendingRewards.toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="inputs">
+                                                <button type="button" class="btn btn-default form-button" @click="farmClaim(farm)">Claim</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" :id="'farmDialogRoi' + index" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <div class="title icon calc">ROI</div>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span class="mdi mdi-close"></span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="roi-calculator-container">
+                                                <div class="column">
+                                                    <div class="label">Timeframe</div>
+                                                    <div class="input">1d</div>
+                                                    <div class="input">7d</div>
+                                                    <div class="input">30d</div>
+                                                    <div class="input">365d</div>
+                                                    <br>
+                                                    <div class="label" style="color: white; border-radius: 0 0 0 15px; padding: 7px;background: #5a2607;text-align: center;">Farm APR</div>
+                                                    <div class="label" style="color: white; border-radius: 0 0 0 15px; padding: 7px;background: #5a2607;text-align: center;">Fee APR</div>
+                                                </div>
+                                                <div class="column">
+                                                    <div class="label">ROI</div>
+                                                    <div class="input" id="roi1d"><span>{{formatNumber(((farm.apy + farm.feeApr)/365).toLocaleString('en-US'))}}</span>%</div>
+                                                    <div class="input" id="roi7d"><span>{{formatNumber((((farm.apy + farm.feeApr)/365)*7).toLocaleString('en-US'))}}</span>%</div>
+                                                    <div class="input" id="roi30d"><span>{{formatNumber((((farm.apy + farm.feeApr)/365)*30).toLocaleString('en-US'))}}</span>%</div>
+                                                    <div class="input" id="roi365d"><span>{{formatNumber((((farm.apy + farm.feeApr)/365)*365).toLocaleString('en-US'))}}</span>%</div>
+                                                    <br>
+                                                    <div class="label" style="color: white; margin-left: -5px; border-radius: 0 15px 0 0; padding: 7px;background: #5a2607 ;text-align: center;">{{formatNumber(farm.apy.toLocaleString('en-US'))}}%</div>
+                                                    <div class="label" style="background: linear-gradient( 90deg ,#5a2607,#5a2607 25%,#5a2607 50%,#5a2607 75%,#5a2607);color: white; margin-left: -5px; border-radius: 0 15px 0 0; padding: 7px;text-align: center;">{{formatNumber(farm.feeApr.toLocaleString('en-US'))}}%</div>
+                                                </div>
+                                                <p class="small"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="vault-container collapsed" data-id="1">
+                                <div class="vault-header w-100" style="border-bottom-left-radius: 30px;">
+                                    <div class="logo-container">
+                                        <div class="vault-logo">
+                                            <div class="img" style="background-image: url('assets/images/farms/question-farm.png')"></div>
+                                        </div>
+                                        <div class="vault-info">
+                                            <div class="title no-info">Your Project?</div>
+                                        </div>
+                                    </div>
+                                    <div class="information-container c4">
+                                        <div class="apply-container">
+                                            <button type="button" class="btn btn-default form-button" onclick="window.open('https: ', '_blank')">Apply Now</button>
+                                        </div>
+                                        <div class="vault-liquidity">
+                                            <div class="total"><span>????</span>%</div>
+                                            <div class="small-info">APR</div>
+                                        </div>
+                                        <div class="vault-liquidity">
+                                            <div class="total">$<span>????</span></div>
+                                            <div class="small-info">Liquidity</div>
+                                        </div>
+                                    </div>
+                                    <div class="vault-chevron">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- /pools -->
+                <div class="container-fluid page-container" v-if="selectedSection == 3">
+                    <div class="row mb-4">
+                        <div class="col-xl-7 order-1 order-xl-0 filters">
+                            <div class="row">
+                                <div class="filter col-md-4 mb-2 mb-md-0">
+                                    <div class="title">Sort by</div>
+                                    <div class="vault-select-wrapper">
+                                        <div class="vault-select">
+                                            <input type="hidden" id="sortBy" value="default">
+                                            <div class="vault-select__trigger"><span>Default</span>
+                                                <div class="arrow"></div>
+                                            </div>
+                                            <div class="custom-options">
+                                                <span class="custom-option selected" data-value="default">Default</span>
+                                                <span class="custom-option" data-value="apr">APR</span>
+                                                <span class="custom-option" data-value="liquidity">Liquidity</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="filter col-md-4">
+                                    <div class="title">Search</div>
+
+                                    <div class="input-search">
+                                        <input type="text" name="search" v-model="poolsSearch">
+                                    </div>
+
+                                </div>
+                                <div class="filter col-md-4">
+                                    <label class="custom-checkbox">Staked only
+                                        <input type="checkbox" v-model="poolsStakedOnly" :disabled="selectedAccount == null">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-5 order-0 order-xl-1 mb-3 mb-xl-0 text-right">
+                            <div class="info-tvl d-flex justify-content-between" id="tvlValts">
+                                <div class="label">TVL:</div>
+                                <div class="total">$<span style="font-family: 'NeutraDisp-Bold'">{{formatNumber(selectedWpools.reduce(function (accumulator, wpool) {return accumulator + wpool.totalValueLocked;}, 0).toLocaleString('en-US'),0)}}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" v-for="(wpool, index) in selectedWpools" :key="wpool.i">
+                            <div class="vault-container collapsed" data-id="1">
+                                <div class="vault-header w-100">
+                                    <img v-if="wpool.isNew" src="assets/images/new-badge.svg" alt="New" style="position: absolute; max-width: 3rem; left: 5px; top: 5px;z-index: 1;">
+                                    <img v-if="wpool.isBoosted" src="assets/images/boosted-badge.svg" alt="Boosted" style="position: absolute; max-width: 4.5rem; left: 5px; top: 5px;z-index: 1;">
+                                    <img v-if="wpool.isFinished || wpool.endString === '0 days and 0 hours'" src="assets/images/ended-badge.svg" alt="Finished" style="position: absolute; max-width: 3.5rem; left: 5px; top: 5px;z-index: 1;">
+                                    <div class="logo-container">
+                                        <div class="vault-logo">
+                                            <div class="img" :style="wpool.style"></div>
+                                        </div>
+                                        <div class="vault-info">
+                                            <a href="#" class="title" @click="jQuery('#wpoolDialogInformation'+index).modal('show');" onclick="return false;" v-html="wpool.title"></a>
+                                            <div class="get">
+                                                <span style="color:unset">Stake RNBO</span>
+                                            </div>
+                                            <div class="date" style="font-family: 'NeutraDisp-Bold'">{{(wpool.isFinished || wpool.endString === '0 days and 0 hours') ? 'Ended' : 'Ends in ' + wpool.endString}}</div>
+                                        </div>
+                                        <div class="vault-digging">
+                                        </div>
+                                    </div>
+                                    <div class="information-container c4">
+                                        <div class="vault-staked">
+                                            <div class="total"><span :class="[{ 'small-na' : selectedAccount == null}]">{{selectedAccount != null ? formatNumber(wpool.amount.toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="small-info">RNBO Staked</div>
+                                        </div>
+                                        <div class="vault-earned">
+                                            <div class="total"><span :class="[{ 'small-na' : selectedAccount == null}]">{{selectedAccount != null ? (wpool.earned === 'WSG' ? formatNumber(wpool.pendingRewards.toLocaleString('en-US'), 0) : formatNumber(wpool.pendingRewards.toLocaleString('en-US'), 8)) : 'N/A'}}</span></div>
+                                            <div class="small-info">{{wpool.earned}} Earned</div>
+                                        </div>
+                                        <div class="vault-apy">
+                                            <a href="#" @click="jQuery('#wpoolDialogRoi'+index).modal('show');" class="total" onclick="return false;"><span>{{formatNumber(wpool.apy.toLocaleString('en-US'))}}</span>%</a>
+                                            <div class="small-info">APR</div>
+                                        </div>
+                                        <div class="vault-liquidity">
+                                            <div class="total"><span>{{formatNumber((wpool.totalValueLocked / rnboPrice).toLocaleString('en-US'), 0)}}</span></div>
+                                            <div class="small-info">Total Staked</div>
+                                        </div>
+                                    </div>
+                                    <div class="vault-chevron">
+                                        <span class="mdi mdi-chevron-down"></span>
+                                    </div>
+                                </div>
+                                <div class="vault-content w-100">
+                                    <div class="bl balance">
+                                        <div class="vault-form">
+                                            <div class="title">Your RNBO Balance</div>
+                                            <div class="total"><span>{{selectedAccount != null ? formatNumber(wpool.balance.toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="inputs" v-if="(!wpool.isFinished && wpool.endString !== '0 days and 0 hours')">
+                                                <div class="input-group">
+                                                    <input class="input" type="number" min="0" step="0.1" v-model="wpool.depositAmount" />
+                                                    <span class="text" @click="wpoolSetDepositAmount(wpool.i, $event)" style="cursor: pointer">MAX</span>
+                                                </div>
+                                                <button type="button" class="btn btn-default form-button" @click="wpool.isApproved ? wpoolDeposit(wpool) : wpoolApprove(wpool)">{{wpool.isApproved ? 'Stake' : 'Approve' }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bl staked">
+                                        <div class="vault-form">
+                                            <div class="title">RNBO Staked</div>
+                                            <div class="total"><span>{{selectedAccount != null ? formatNumber(wpool.amount.toLocaleString('en-US')) : 'N/A'}}</span></div>
+                                            <div class="inputs">
+                                                <div class="input-group">
+                                                    <input class="input" type="number" min="0" step="0.1" v-model="wpool.withdrawAmount" />
+                                                    <span class="text" @click="wpoolSetWithdrawAmount(wpool.i, $event)" style="cursor: pointer">MAX</span>
+                                                </div>
+                                                <button type="button" class="btn btn-default form-button" @click="wpoolWithdraw(wpool)">Unstake</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bl rewards">
+                                        <div class="vault-form">
+                                            <div class="title">{{wpool.earned}} Earned</div>
+                                            <div class="total"><span>{{selectedAccount != null ? (wpool.earned === 'WSG' ? formatNumber(wpool.pendingRewards.toLocaleString('en-US'), 0) : formatNumber(wpool.pendingRewards.toLocaleString('en-US'), 4)) : 'N/A'}}</span></div>
+                                            <div class="inputs">
+                                                <button type="button" class="btn btn-default form-button" @click="wpoolClaim(wpool)">Claim</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" :id="'wpoolDialogInformation' + index" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-sm modal-dialog-centered" role="document" style="max-width: max-content !important">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <div class="title icon info">Information</div>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span class="mdi mdi-close"></span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p class="description text-left" v-html="wpool.informationText.replace(/(?:\r\n|\r|\n)/g, '<br>')"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" :id="'wpoolDialogRoi' + index" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <div class="title icon calc">ROI</div>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span class="mdi mdi-close"></span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="roi-calculator-container">
+                                                <div class="column">
+                                                    <div class="label">Timeframe</div>
+                                                    <div class="input">1d</div>
+                                                    <div class="input">7d</div>
+                                                    <div class="input">30d</div>
+                                                    <div class="input">365d</div>
+                                                </div>
+                                                <div class="column">
+                                                    <div class="label">ROI</div>
+                                                    <div class="input" id="roi1d"><span>{{formatNumber((wpool.apy/365).toLocaleString('en-US'))}}</span>%</div>
+                                                    <div class="input" id="roi7d"><span>{{formatNumber(((wpool.apy/365)*7).toLocaleString('en-US'))}}</span>%</div>
+                                                    <div class="input" id="roi30d"><span>{{formatNumber(((wpool.apy/365)*30).toLocaleString('en-US'))}}</span>%</div>
+                                                    <div class="input" id="roi365d"><span>{{formatNumber(((wpool.apy/365)*365).toLocaleString('en-US'))}}</span>%</div>
+                                                </div>
+                                                <p class="small"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="vault-container collapsed" data-id="1">
+                                <div class="vault-header w-100" style="border-bottom-left-radius: 30px;">
+                                    <div class="logo-container">
+                                        <div class="vault-logo">
+                                            <div class="img" style="background-image: url('assets/images/wpools/question-pool.png')"></div>
+                                        </div>
+                                        <div class="vault-info">
+                                            <div class="title no-info">Your Project?</div>
+                                        </div>
+                                    </div>
+                                    <div class="information-container c4">
+                                        <div class="apply-container">
+                                            <button type="button" class="btn btn-default form-button" onclick="window.open('  ', '_blank')">Apply Now</button>
+                                        </div>
+                                        <div class="vault-liquidity">
+                                            <div class="total"><span>????</span>%</div>
+                                            <div class="small-info">APR</div>
+                                        </div>
+                                        <div class="vault-liquidity">
+                                            <div class="total"><span>????</span></div>
+                                            <div class="small-info">Total Staked</div>
+                                        </div>
+                                    </div>
+                                    <div class="vault-chevron">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/vendors77ae.js?ver=2"></script>
+    <script type="text/javascript" src="../../unpkg.com/vue%403.1.1/dist/vue.global.prod.js"></script>
+    <script type="text/javascript" src="../../unpkg.com/web3%401.3.0/dist/web3.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/web3modal"></script>
+    <script type="text/javascript" src="https://unpkg.com/@walletconnect/web3-provider"></script>
+    <script type="text/javascript" src="https://unpkg.com/onto-provider"></script>
+    <script type="text/javascript" src="https://unpkg.com/mathjs"></script>
+    <script type="text/javascript" src="https://unpkg.com/sweetalert2"></script>
+    <script>
+        let scr = document.createElement("link");
+        scr.href = "assets/css/app.css" + "?ts=" + new Date().getTime();
+        scr.rel = "stylesheet";
+        document.getElementsByTagName("head")[0].appendChild(scr);
+        let scr1 = document.createElement("link");
+        scr1.href = "assets/css/preloader.css" + "?ts=" + new Date().getTime();
+        scr1.rel = "stylesheet";
+        document.getElementsByTagName("head")[0].appendChild(scr1);
+        let scr2 = document.createElement("script");
+        scr2.src = "assets/js/abis.js" + "?ts=" + new Date().getTime();
+        document.getElementsByTagName("body")[0].appendChild(scr2);
+        let scr3 = document.createElement("script");
+        scr3.src = "assets/js/main.js" + "?ts=" + new Date().getTime();
+        document.getElementsByTagName("body")[0].appendChild(scr3);
+        let scr4 = document.createElement("script");
+        scr4.src = "../../rainbowFarm.finance/realtimeData.js" + "?ts=" + new Date().getTime();
+        document.getElementsByTagName("body")[0].appendChild(scr4);
+        let scr5 = document.createElement("script");
+        document.getElementsByTagName("body")[0].appendChild(scr5);
+        let scr6 = document.createElement("link");
+        scr6.href = "assets/fonts/fonts.css" + "?ts=" + new Date().getTime();
+        scr6.rel = "stylesheet";
+        document.getElementsByTagName("head")[0].appendChild(scr6);
+        let scr7 = document.createElement("script");
+        scr7.src = "assets/js/app.js" + "?ts=" + new Date().getTime();
+        document.getElementsByTagName("body")[0].appendChild(scr7);
+        let scr8 = document.createElement("script");
+        scr8.src = "../../rainbowFarm.finance/farmsData.js" + "?ts=" + new Date().getTime();
+        document.getElementsByTagName("body")[0].appendChild(scr8);
+        let scr9 = document.createElement("script");
+        scr9.src = "../../rainbowFarm.finance/poolsData.js" + "?ts=" + new Date().getTime();
+        document.getElementsByTagName("body")[0].appendChild(scr9);
+    </script>
+</body>
+
+
+</html>
